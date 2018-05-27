@@ -1,0 +1,65 @@
+
+.tabContent li {
+	float: left;
+	margin-right: -1px;
+	margin-bottom: 60px;
+	position: relative;
+	bsort: 1px solid #e4e4e4;
+	margin-left: 50px;
+	bsort: 1px
+} 
+
+.tabContent img {
+	width: 100px;
+	height: 100px;
+	display: block;
+}
+ .price {
+	line-height: 30px;
+	color: #c4161c;
+	font-size: 14px;
+	font-weight: bold;
+}
+.pageDiv{
+float: right;
+margin-bottom: 0px;
+}
+  .classSpan{
+ color:red;
+ } 
+ 
+ 
+ .imgDiv{
+float: left;
+}
+.formDiv{
+ margin-left:230px;
+}
+.formDiv input{
+border:none;
+height: 25px;
+width:120px;
+}
+.formDiv div{
+margin-bottom:20px;
+}
+.buttonDiv{
+margin-left:230px;
+}
+#decreaseCount{
+ margin-left:10px;
+}
+#addCount{
+ margin-right:10px;
+}
+  
+#decreaseCssById, #addCssById,#decreaseShopCssById,#addShopCssById{
+     display: inline-block;
+     cursor:pointer;
+     width: 28px;
+     height: 21px;
+     line-height:21px;
+     text-align: center;
+     font-size: 15px;
+     border: 1px solid #e6e6e6;
+ }  

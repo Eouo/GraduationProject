@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iozhaq.dao.ProductDao">
+
+    <select id="ShopProduct" resultType="Product">
+        select * from(select
+        product_id productId,
+        product_name productName,
+        img_url imgUrl,
+        price price,
+        count count,
+        detail detail,
+        type type
+        from product
+        <where>
+            count>0 and type=1
+            <if test="productName!=null and productName!='' ">
+                and product_name like concat('%',#{productName},'%')
+            </if>
+
+            <if test="startMoney !=null and startMoney!=''">
+                and price <![CDATA[  >=  ]]> #{startMoney}
+            </if>
+            <if test="endMoney !=null and endMoney!=''">
+                and price <![CDATA[   <=  ]]> #{endMoney}
+            </if>
+        </where>
+        ) p ,(select count(*) as total from product
+        <where>
+            count>0 and type=1
+            <if test="productName!=null and productName!='' ">
+                and product_name like concat('%',#{productName},'%')
+            </if>
+
+            <if test="startMoney !=null and startMoney!=''">
+                and price <![CDATA[  >=  ]]> #{startMoney}
+            </if>
+            <if test="endMoney !=null and endMoney!=''">
+                and price <![CDATA[   <=  ]]> #{endMoney}
+            </if>
+            ) c
+            <if test="numStart!=10000">
+                limit #{numStart},10
+            </if>
+
+        </where>
+
+    </select>
+
+
+    <select id="productById" resultType="Product">
+        SELECT
+            product_id   productId,
+            product_name productName,
+            price        price,
+            count        count,
+            type         type
+        FROM product
+        WHERE product_id = #{productId}
+    </select>
+
+    <select id="RepertoryList" resultType="Product">
+        select
+        product_id productId,
+        product_name productName,
+        img_url imgUrl,
+        price price,
+        count count,
+        detail detail,
+        type type
+        from product
+        <where>
+            1=1
+            <if test="productName!=null and productName!='' ">
+                and product_name like concat('%',#{productName},'%')
+            </if>
+            <if test="type !=null and type!=''">
+                and type=#{type}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="AddProduct">
+        INSERT INTO product (product_name, price, count, detail, type, img_url)
+        VALUES (#{productName}, #{price}, #{count}, #{detail}, "0", "product.png")
+    </insert>
+
+
+    <update id="UpdateProduct">
+        update product set
+        <if test="imgUrl == null or imgUrl == ''">
+            product_name=#{productName},price=#{price},count=#{count},detail=#{detail}
+        </if>
+        <if test="imgUrl != null and imgUrl != ''">
+            img_url=#{imgUrl}
+        </if>
+        where product_id=#{productId}
+    </update>
+
+
+    <insert id="createProduct">
+        INSERT INTO product (product_id, productName, price, count, detail, type)
+        VALUES (#{productId}, #{productName}, #{price}, #{count}, #{detail}, #{type})
+    </insert>
+
+
+    <delete id="DelProduct" parameterType="java.util.List">
+        delete from product where product_id in
+        <foreach item="id" collection="list" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </delete>
+
+
+    <update id="upOrDownShopProduct" parameterType="int">
+        UPDATE product
+        SET type = #{type}
+        WHERE product_id = #{productId}
+    </update>
+
+    <update id="updateShopCardType">
+        UPDATE shop_card
+        SET type = #{type}
+        WHERE product_id = #{productId}
+    </update>
+
+    <update id="UpdateProductCount" parameterType="java.util.List">
+
+        <foreach collection="shopCardList" item="shopCard" index="index">
+
+            update product set count = count- #{shopCard.count}
+            where product_id = #{shopCard.productId } ;
+        </foreach>
+    </update>
+
+    <update id="cancelRecordCount">
+        UPDATE product
+        SET count = count + #{count}
+        WHERE product_id = #{productId };
+    </update>
+
+    <update id="productIsOver">
+        update product set type=0 where count <![CDATA[   <=  ]]>  0 and product_id in
+        <foreach item="shopCard" collection="list" open="(" close=")" separator=",">
+            #{shopCard.productId}
+        </foreach>
+    </update>
+</mapper>

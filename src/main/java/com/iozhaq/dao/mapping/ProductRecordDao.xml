@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iozhaq.dao.ProductRecordDao">
+
+
+    <select id="RecordList" resultType="ProductRecord">
+        select
+        order_id orderId,
+        product_id productId,
+        product_name productName,
+        price price,
+        count count,
+        pr.address address,
+        address_name addressName,
+        address_phone addressPhone,
+        u.user_name userName,
+        pr.user_id userId,
+        pr.type type,
+        pr.state state,
+        order_time orderTime,
+        total_money totalMoney
+        from product_record pr,user u
+        <where>
+            pr.user_id=u.user_id
+            <if test="productName!=null and productName!='' ">
+                and product_name like concat('%',#{productName},'%')
+            </if>
+            <if test="userName !=null and userName!=''">
+                and u.user_name like concat('%',#{userName},'%')
+            </if>
+
+
+            <choose>
+                <when test="userId ==1 ">
+                </when>
+                <otherwise>
+                    and pr.user_id =#{userId} and pr.type='1'
+                </otherwise>
+            </choose>
+
+            <if test="orderTime !=null and orderTime!=''">
+                and order_time like concat(#{orderTime},'%')
+            </if>
+            <if test="state !=null and state!=''">
+                and state = #{state}
+            </if>
+        </where>
+        ORDER BY order_time desc
+    </select>
+
+
+    <insert id="addProductRecord1" parameterType="java.util.List">
+        insert into product_record(product_id,product_name,price,count,user_id,
+        address,address_name,address_phone,order_time,type,state)
+        values
+        <foreach collection="shopCardList" item="product" index="index" separator=",">
+            (#{product.productId},#{product.productName},#{product.price},#{product.count},#{productRecord.userId},
+            #{productRecord.address},#{productRecord.addressName},#{productRecord.addressPhone},#{productRecord.orderTime},'1','0')
+        </foreach>
+    </insert>
+
+
+    <insert id="addProductRecord">
+        INSERT INTO product_record (product_id, product_name, price, count, user_id, address, address_name, address_phone, order_time, total_money, type, state)
+        VALUES
+            (#{productId}, #{productName}, #{price}, #{count}, #{userId}, #{address}, #{addressName}, #{addressPhone},
+                           #{orderTime}, #{totalMoney}, '1', '0')
+    </insert>
+
+
+    <update id="UserDelProduct">
+        update product_record set type='0' where order_id in
+        <foreach item="id" collection="list" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="DelProduct">
+        delete from product_record where order_id in
+        <foreach item="id" collection="list" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="cancelDel">
+        UPDATE product_record
+        SET type = '1'
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="cancelOrDownRecord">
+        UPDATE product_record
+        SET state = #{state}
+        WHERE order_id = #{orderId}
+    </update>
+
+</mapper>

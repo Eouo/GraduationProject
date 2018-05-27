@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iozhaq.dao.ShopCardDao">
+
+    <select id="ShopCardList" resultType="ShopCard">
+		select 
+			s.shop_card_id shopCardId, 
+			s.user_id userId,
+			s.product_id productId,
+			s.count count,
+			p.type type,
+			p.product_name productName,
+			p.price price, 
+			p.img_url imgUrl,
+			p.count allCount
+		from product p ,shop_card s where s.user_id=#{s.useId} and p.product_id=s.product_id
+	
+	</select>
+	 
+	<insert id="addShopCard">
+		insert into shop_card(product_id,user_id,count) 
+		values(#{productId},#{userId},#{count})
+	</insert>
+	
+	<update id="saveShopCard">
+		update shop_card set count=count+#{count}
+		where product_id=#{productId} and user_id=#{userId}
+	</update>
+	<update id="updateShopCard">
+		update shop_card set count=#{count}
+		where shop_card_id=#{shopCardId} 
+	</update>
+    <select id="isShopCard" resultType="java.lang.Integer"  >
+			select count(*) from shop_card  where product_id=#{productId} and user_id=#{userId}
+	</select>
+	
+	<select id="productCount" resultType="java.lang.Integer" >
+			select count from product  where product_id=#{productId}
+	</select>
+	<select id="shopcardById"  resultType="ShopCard">
+		
+		select 
+			s.shop_card_id shopCardId, 
+			s.user_id userId,
+			s.product_id productId,
+			s.count count,
+			p.type type,
+			p.product_name productName,
+			p.price price 
+		from product p ,shop_card s where  p.product_id=s.product_id and shop_card_id=#{shopCardId}
+	
+	</select>
+	 <delete id="DelShopCard" parameterType="java.util.List" >
+        delete from shop_card where shop_card_id in
+        <foreach item="id" collection="list" open="(" close=")" separator=",">
+             #{id}
+        </foreach>
+    </delete>
+	 
+</mapper>

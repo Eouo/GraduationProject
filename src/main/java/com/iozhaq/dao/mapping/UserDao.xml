@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iozhaq.dao.UserDao">
+
+	<resultMap id="addressMap" type="com.iozhaq.beans.Address">
+		<result property="userId" column="user_id" />
+		<result property="addressId" column="address_id" />
+		<result property="address" column="address" />
+		<result property="addressDetail" column="address_detail" />
+		<result property="addressName" column="address_name" />
+		<result property="addressPhone" column="address_phone" />
+		<result property="type" column="type" />
+	</resultMap>
+
+
+	<select id="AddressList" resultMap="addressMap">
+		select
+		user_id userId,
+		address_id addressId,
+		address address,
+		address_detail addressDetail,
+		address_name addressName,
+		address_phone addressPhone,
+		type type
+		from address where user_id=#{userId}
+	</select>
+
+
+	<select id="findByUserName" resultType="User">
+		select
+		user_id userId,
+		user_name userName,
+		user_code userCode,
+		img_url imgUrl,
+		sex sex,
+		age age,
+		phone phone,
+		e_mail eMail,
+		address address,
+		type type,
+		praise_rate praiseRate
+		from user where user_name=#{userName}
+	</select>
+
+
+	<select id="findByUserId" resultType="User">
+		select
+		user_id userId,
+		user_name userName,
+		user_code userCode,
+		img_url imgUrl,
+		sex sex,
+		age age,
+		phone phone,
+		e_mail eMail,
+		address address,
+		type type,
+		praise_rate praiseRate
+		from user where user_id=#{userId}
+	</select>
+	<select id="login" resultType="User">
+		select
+		user_id userId,
+		user_name userName,
+		user_code userCode,
+		img_url imgUrl,
+		password password,
+		sex sex,
+		age age,
+		phone phone,
+		type type,
+		e_mail eMail,
+		address address,
+		praise_rate praiseRate
+		from user where user_name=#{userName} and
+		password=#{password} and type like concat(#{type},'%')
+	</select>
+	
+	<select id="UserList" resultType="User">
+		select
+		user_id userId,
+		user_name userName,
+		user_code userCode,
+		sex sex,
+		age age,
+		phone phone,
+		e_mail eMail,
+		img_url imgUrl,
+		address address,
+		type type,
+		praise_rate praiseRate
+		from user where 1=1
+	</select>
+
+
+
+	<select id="UserListByQuery" resultType="User">
+		select
+		user_id userId,
+		user_name userName,
+		user_code userCode,
+		img_url imgUrl,
+		sex sex,
+		age age,
+		phone phone,
+		e_mail eMail,
+		address address,
+		type type,
+		praise_rate praiseRate
+		from user
+		<where>
+
+			<if test="userName!=null and userName!='' ">
+				and user_name like concat('%',#{userName},'%')
+			</if>
+			<if test="sex !=null and sex!=''">
+				and sex=#{sex}
+			</if>
+		</where>
+
+	</select>
+
+	<update id="updateUser" parameterType="User">
+		update user set
+		user_name=#{userName},sex=#{sex},age=#{age},phone=#{phone},e_mail=#{eMail},address=#{address}
+		<if test="imgUrl != null and imgUrl != ''">
+			,img_url=#{imgUrl}
+		</if>
+		where user_id=#{userId}
+	</update>
+
+	<select id="findByUserIdAndPassword" resultType="User">
+		select
+		user_id userId,
+		user_name userName,
+		user_code userCode,
+		img_url imgUrl,
+		sex sex,
+		age age,
+		phone phone,
+		e_mail eMail,
+		address address,
+		type type,
+		praise_rate praiseRate
+		from user where user_id=#{userId} and
+		password=#{oldPassword}
+	</select>
+
+	<update id="editPassword">
+		update user set password=#{password}
+		where user_id=#{userId}
+	</update>
+
+	<insert id="createUser">
+		insert into
+		user(user_name,sex,age,phone,e_mail,address,password,type)
+		values(#{userName},#{sex},#{age},#{phone},#{eMail},#{address},#{password},'11')
+	</insert>
+
+	<update id="editType">
+		update user set type=#{type} where
+		user_id=#{userId}
+	</update>
+
+
+	<insert id="addAddress">
+		insert into
+		address(user_id,address,address_detail,address_name,address_phone,type)
+		value(#{userId},#{address},#{addressDetail},#{addressName},#{addressPhone},'0')
+	</insert>
+
+	<update id="updateAddress">
+		update address set
+		address=#{address},address_detail=#{addressDetail},address_name=#{addressName},address_phone=#{addressPhone}
+		where address_id=#{addressId}
+	</update>
+
+	<delete id="delAddress" parameterType="java.util.List">
+		delete from address where address_id in
+		<foreach item="id" collection="list" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+
+	</delete>
+
+	<update id="CancelDefaultAddress" parameterType="java.util.List">
+		update address set type="0" where address_id in
+		<foreach item="address" collection="list" open="(" close=")"
+			separator=",">
+			#{address.addressId}
+		</foreach>
+
+	</update>
+	<update id="defaultAddress">
+		update address set type="1" where address_id =#{addressId}
+	</update>
+
+	<select id="AddressById" resultMap="addressMap">
+		select
+		address_id addressId,
+		address address,
+		address_detail addressDetail,
+		address_name addressName,
+		address_phone addressPhone
+		from address where address_id=#{addressId}
+	</select>
+
+</mapper>
